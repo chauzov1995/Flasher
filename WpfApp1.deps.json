@@ -8,7 +8,10 @@
     ".NETCoreApp,Version=v3.0": {
       "WpfApp1/1.0.0": {
         "dependencies": {
-          "Google.Apis.CloudIot.v1": "1.53.0.2273",
+          "Google.Apis": "1.54.0",
+          "Google.Apis.Auth": "1.54.0",
+          "Google.Apis.CloudIot.v1": "1.54.0.2273",
+          "Google.Apis.Core": "1.54.0",
           "Newtonsoft.Json": "13.0.1",
           "System.IO.Ports": "5.0.1"
         },
@@ -16,53 +19,53 @@
           "WpfApp1.dll": {}
         }
       },
-      "Google.Apis/1.53.0": {
+      "Google.Apis/1.54.0": {
         "dependencies": {
-          "Google.Apis.Core": "1.53.0"
+          "Google.Apis.Core": "1.54.0"
         },
         "runtime": {
           "lib/netstandard2.0/Google.Apis.dll": {
-            "assemblyVersion": "1.53.0.0",
-            "fileVersion": "1.53.0.0"
+            "assemblyVersion": "1.54.0.0",
+            "fileVersion": "1.54.0.0"
           }
         }
       },
-      "Google.Apis.Auth/1.53.0": {
+      "Google.Apis.Auth/1.54.0": {
         "dependencies": {
-          "Google.Apis": "1.53.0",
-          "Google.Apis.Core": "1.53.0"
+          "Google.Apis": "1.54.0",
+          "Google.Apis.Core": "1.54.0"
         },
         "runtime": {
           "lib/netstandard2.0/Google.Apis.Auth.PlatformServices.dll": {
-            "assemblyVersion": "1.53.0.0",
-            "fileVersion": "1.53.0.0"
+            "assemblyVersion": "1.54.0.0",
+            "fileVersion": "1.54.0.0"
           },
           "lib/netstandard2.0/Google.Apis.Auth.dll": {
-            "assemblyVersion": "1.53.0.0",
-            "fileVersion": "1.53.0.0"
+            "assemblyVersion": "1.54.0.0",
+            "fileVersion": "1.54.0.0"
           }
         }
       },
-      "Google.Apis.CloudIot.v1/1.53.0.2273": {
+      "Google.Apis.CloudIot.v1/1.54.0.2273": {
         "dependencies": {
-          "Google.Apis": "1.53.0",
-          "Google.Apis.Auth": "1.53.0"
+          "Google.Apis": "1.54.0",
+          "Google.Apis.Auth": "1.54.0"
         },
         "runtime": {
           "lib/netstandard2.0/Google.Apis.CloudIot.v1.dll": {
-            "assemblyVersion": "1.53.0.2273",
-            "fileVersion": "1.53.0.2273"
+            "assemblyVersion": "1.54.0.2273",
+            "fileVersion": "1.54.0.2273"
           }
         }
       },
-      "Google.Apis.Core/1.53.0": {
+      "Google.Apis.Core/1.54.0": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/Google.Apis.Core.dll": {
-            "assemblyVersion": "1.53.0.0",
-            "fileVersion": "1.53.0.0"
+            "assemblyVersion": "1.54.0.0",
+            "fileVersion": "1.54.0.0"
           }
         }
       },
@@ -221,33 +224,33 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Google.Apis/1.53.0": {
+    "Google.Apis/1.54.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-nLVl91WLUHuU/WVQfGXXf2UcNguTRvVorZujT06q6fjYKk/Q6UJDgEcO5Ti00vdb40sT1GQwnqUpPeSKjLSn2Q==",
-      "path": "google.apis/1.53.0",
-      "hashPath": "google.apis.1.53.0.nupkg.sha512"
+      "sha512": "sha512-53PujXOst4JNibnySRlOzduBwr3wt4hiLPbVCpZs/P2G8waltIW3cmma6sG7lTaW9ag/3T6MtIgt/uFtWBBkwA==",
+      "path": "google.apis/1.54.0",
+      "hashPath": "google.apis.1.54.0.nupkg.sha512"
     },
-    "Google.Apis.Auth/1.53.0": {
+    "Google.Apis.Auth/1.54.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-f8MhaaP9aRoVpybRNfMKzBFrNh/Hw3z1TUBFsWWXYZOgcXFFUuFCFmAxyIjixdYxDG+DCwkoVnf5lSIXEy3QdA==",
-      "path": "google.apis.auth/1.53.0",
-      "hashPath": "google.apis.auth.1.53.0.nupkg.sha512"
+      "sha512": "sha512-gVWia+KE7MLBTiAaDG//TociR6lE0/reEXx+go065L/w20skB2Ib58vnp4iGPaLehwY8ib8XmXy3P1n/Fr5Y4A==",
+      "path": "google.apis.auth/1.54.0",
+      "hashPath": "google.apis.auth.1.54.0.nupkg.sha512"
     },
-    "Google.Apis.CloudIot.v1/1.53.0.2273": {
+    "Google.Apis.CloudIot.v1/1.54.0.2273": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OqnMDITQeG4hkOUbKXyCUpGdRrIioptZ4UkXst4k9uXm/yiV0FgmejZB7/4ZcU1qx8v60WzM8FwR7q1swjMN9A==",
-      "path": "google.apis.cloudiot.v1/1.53.0.2273",
-      "hashPath": "google.apis.cloudiot.v1.1.53.0.2273.nupkg.sha512"
+      "sha512": "sha512-o5gRvyf4Vc4yvO1ccjYGfX5bhkZFbAYvOyT4J6eXm0hAZccb4KFCshVKAeaAcsYrYeSzDqb9vKWEo/8KSeGoUA==",
+      "path": "google.apis.cloudiot.v1/1.54.0.2273",
+      "hashPath": "google.apis.cloudiot.v1.1.54.0.2273.nupkg.sha512"
     },
-    "Google.Apis.Core/1.53.0": {
+    "Google.Apis.Core/1.54.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6pTO2f75pwYag0DenUz4A3fPBi2t8qHhlPAVXP6hsSWU5lP7pPqsxV8Oc2sgcBwVquMIL6DVw23Woc2vC73E9A==",
-      "path": "google.apis.core/1.53.0",
-      "hashPath": "google.apis.core.1.53.0.nupkg.sha512"
+      "sha512": "sha512-NKeTTKCttOQrLUCyLyRo5m53b2mG8ymJaiL+i1fR6w8TrrHD31ixPGO+BlwQs9OLuLd/p8BKkSdSaNGjKw5rkA==",
+      "path": "google.apis.core/1.54.0",
+      "hashPath": "google.apis.core.1.54.0.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/5.0.0": {
       "type": "package",
