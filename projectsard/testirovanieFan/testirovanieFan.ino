@@ -84,7 +84,7 @@ void setup() {
   WiFiMulti.addAP("Giulia Novars", "Giulia49");
   WiFiMulti.addAP("AIP", "AIP43211234");
   WiFiMulti.addAP("MikroTik", "Qw8675309Qw");
-
+  WiFiMulti.addAP("Keenetic-8138", "3kEMmPdz");
 
 }
 
@@ -136,7 +136,22 @@ void loop() {
   }
   if (millis() - timing > 100) { // Вместо 10000 подставьте нужное вам значение паузы
     timing = millis();
-    if (firsasda) {
+
+
+    if (error) {
+      digitalWrite(LED_BUILTIN, pwr % 2 == 1 ? LOW : HIGH);
+    }
+    pwr++;
+    //  Serial.println(pwr);
+    if (pwr > 99) {
+      pwr = 0;
+    }
+    delay(100);
+    buttonState = digitalRead(BUTT_CONF);
+    // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+    if (buttonState == HIGH) {
+
+
       if ((WiFiMulti.run() == WL_CONNECTED)) {
         float humd = sht20.readHumidity(); // Read Humidity
         if (humd < 10 || humd > 90) {
@@ -177,36 +192,24 @@ void loop() {
         error = true;
         Serial.println("no wifi");
       }
-      firsasda = false;
-    } else {
+
 
       if (error) {
-        digitalWrite(LED_BUILTIN, pwr % 2 == 1 ? LOW : HIGH);
-      }
-      pwr++;
-      if (pwr > 100) {
-        pwr = 0;
-      }
-      delay(100);
-      buttonState = digitalRead(BUTT_CONF);
-      // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-      if (buttonState == HIGH) {
-        if (error) {
 
 
-          Serial.println("error");
-          //   ESP.restart();
-        } else {
-          digitalWrite(LED_BUILTIN,  HIGH);
-          Serial.println("succes");
-          WiFiClient client;
-          String  pathupd = "http://4k.teplogico.ru/";
-          pathupd += "fan";
-          pathupd += ".bin";
-          t_httpUpdate_return ret = httpUpdate.update(client, pathupd);
-          delay(100000);
-        }
+        Serial.println("error");
+        //   ESP.restart();
+      } else {
+        digitalWrite(LED_BUILTIN,  HIGH);
+        Serial.println("succes");
+        WiFiClient client;
+        String  pathupd = "http://4k.teplogico.ru/";
+        pathupd += "fan";
+        pathupd += ".bin";
+        t_httpUpdate_return ret = httpUpdate.update(client, pathupd);
+        delay(100000);
       }
     }
+
   }
 }
