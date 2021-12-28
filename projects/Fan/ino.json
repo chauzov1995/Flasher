@@ -1,0 +1,9 @@
+{
+"binname": "Fan.ino.pico32.bin",
+"nameDir": "Fan",
+"name": "Fan",
+"desc": "Fan (устар гугл иот коре)",
+"prefix":"GV_",
+"intver": 0,
+"project": "greenvent-632e2",
+}

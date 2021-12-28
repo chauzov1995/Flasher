@@ -1,0 +1,9 @@
+{
+"binname": "SmartKitchen.ino.pico32.bin",
+"nameDir": "SmartKitchen",
+"name": "SmartKitchen",
+"desc": "SmartKitchen (устар гугл иот коре)",
+"prefix":"GN_",
+"intver": 0,
+"project": "giulia-novars-smart-realtime",
+}

@@ -1,0 +1,9 @@
+{
+"binname": "Fan.ino.pico32.bin",
+"nameDir": "FanFB",
+"name": "Fan",
+"desc": "Fan FireBase",
+"prefix":"GV_",
+"intver": 1,
+"project": "greenvent-632e2",
+}

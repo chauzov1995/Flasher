@@ -1,0 +1,9 @@
+{
+"binname": "Co2Sta.ino.pico32.bin",
+"nameDir": "Co2Sta",
+"name": "Co2Sta",
+"desc": "Co2Sta (устар гугл иот коре)",
+"prefix":"GV_",
+"intver": 0,
+"project": "greenvent-632e2",
+}
