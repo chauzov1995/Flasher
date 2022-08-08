@@ -1,8 +1,10 @@
 {
-"binname": "Fan.ino.pico32.bin",
+"binname": "Fan.ino.bin",
+"bootloader": "Fan.ino.bootloader.bin",
+"partitions": "Fan.ino.partitions.bin",
 "nameDir": "Fan",
 "name": "Fan",
-"desc": "Fan (устар гугл иот коре)",
+"desc": "Fan",
 "prefix":"GV_",
 "intver": 0,
 "project": "greenvent-632e2",
