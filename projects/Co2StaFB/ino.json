@@ -1,9 +1,0 @@
-{
-"binname": "Co2Sta.ino.pico32.bin",
-"nameDir": "Co2StaFB",
-"name": "Co2Sta",
-"desc": "Co2Sta FireBase",
-"prefix":"GV_",
-"intver": 1,
-"project": "greenvent-632e2",
-}
