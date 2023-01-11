@@ -1,9 +1,11 @@
 {
-"binname": "SmartKitchen2.ino.pico32.bin",
+"binname": "SmartKitchen2.ino.bin",
+"bootloader": "SmartKitchen2.ino.bootloader.bin",
+"partitions": "SmartKitchen2.ino.partitions.bin",
 "nameDir": "SmartKitchen2",
 "name": "SmartKitchen2",
-"desc": "SmartKitchen2 (устар гугл иот коре)",
+"desc": "SmartKitchen2",
 "prefix":"GN_",
-"intver": 0,
+"intver": 1,
 "project": "giulia-novars-smart-realtime",
 }
