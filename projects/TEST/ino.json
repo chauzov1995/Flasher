@@ -1,0 +1,13 @@
+{
+"binname": "TEST.ino.bin",
+"bootloader": "TEST.ino.bootloader.bin",
+"partitions": "TEST.ino.partitions.bin",
+"nameDir": "TEST",
+"name": "TEST",
+"desc": "TEST",
+"prefix":"GN_",
+"intver": 1,
+"project": "giulia-novars-smart-realtime",
+}
+
+
