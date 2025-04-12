@@ -1,0 +1,13 @@
+{
+"binname": "Teplica.ino.bin",
+"bootloader": "Teplica.ino.bootloader.bin",
+"partitions": "Teplica.ino.partitions.bin",
+"nameDir": "Teplica",
+"name": "Teplica",
+"desc": "Teplica",
+"prefix":"GN_",
+"intver": 1,
+"project": "giulia-novars-smart-realtime",
+}
+
+
