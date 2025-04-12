@@ -1,0 +1,13 @@
+{
+"binname": "testteplica.ino.bin",
+"bootloader": "testteplica.ino.bootloader.bin",
+"partitions": "testteplica.ino.partitions.bin",
+"nameDir": "testteplica",
+"name": "testteplica",
+"desc": "testteplica",
+"prefix":"GN_",
+"intver": 1,
+"project": "giulia-novars-smart-realtime",
+}
+
+
