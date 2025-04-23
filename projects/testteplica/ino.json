@@ -8,6 +8,7 @@
 "prefix":"GN_",
 "intver": 1,
 "project": "giulia-novars-smart-realtime",
+"erase": true,
 }
 
 
