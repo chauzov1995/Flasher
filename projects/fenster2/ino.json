@@ -1,0 +1,13 @@
+{
+"binname": "fenster2.ino.bin",
+"bootloader": "fenster2.ino.bootloader.bin",
+"partitions": "fenster2.ino.partitions.bin",
+"nameDir": "fenster2",
+"name": "fenster2",
+"desc": "fenster2",
+"prefix":"GN_",
+"intver": 1,
+"project": "giulia-novars-smart-realtime"
+}
+
+
