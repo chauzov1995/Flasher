@@ -1,0 +1,14 @@
+{
+"binname": "testfenster.ino.bin",
+"bootloader": "testfenster.ino.bootloader.bin",
+"partitions": "testfenster.ino.partitions.bin",
+"nameDir": "testfenster",
+"name": "testfenster",
+"desc": "testfenster",
+"prefix":"GN_",
+"intver": 1,
+"project": "giulia-novars-smart-realtime",
+"erase": true,
+}
+
+
