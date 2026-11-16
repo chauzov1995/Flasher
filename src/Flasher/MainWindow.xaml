@@ -51,7 +51,7 @@
                                 <Grid>
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="67"/><ColumnDefinition Width="*"/><ColumnDefinition Width="97"/><ColumnDefinition Width="126"/></Grid.ColumnDefinitions>
                                     <CheckBox x:Name="chk_all" Click="chk_all_Click" VerticalAlignment="Center" Content="Все" FontSize="12"
-                                              ToolTip="Выбрать все платы или снять выбор"/>
+                                              ToolTip="Выбрать все готовые строки или снять выбор"/>
                                     <TextBlock Grid.Column="1" Style="{StaticResource Caption}" Text="Профиль прошивки"/>
                                     <TextBlock Grid.Column="2" Style="{StaticResource Caption}" Text="Порт"/>
                                     <TextBlock Grid.Column="3" Style="{StaticResource Caption}" Text="Действия"/>
@@ -94,7 +94,7 @@
                                                     </TextBlock>
                                                 </Grid>
                                                 <Grid Grid.Column="2" Margin="0,0,9,0">
-                                                    <ComboBox x:Name="portBox" SelectedItem="{Binding Port, Mode=TwoWay}" ItemsSource="{Binding portNames}" AutomationProperties.Name="COM-порт"/>
+                                                    <ComboBox x:Name="portBox" SelectedItem="{Binding Port, Mode=TwoWay}" ItemsSource="{Binding PortChoices}" AutomationProperties.Name="COM-порт"/>
                                                     <TextBlock Text="Порт" Margin="12,0,24,0" IsHitTestVisible="False">
                                                         <TextBlock.Style><Style TargetType="TextBlock" BasedOn="{StaticResource Caption}"><Setter Property="Visibility" Value="Collapsed"/>
                                                             <Style.Triggers><DataTrigger Binding="{Binding SelectedIndex, ElementName=portBox}" Value="-1"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
@@ -108,21 +108,11 @@
                                                         <TextBlock Style="{StaticResource Glyph}" Text="&#xE712;"/>
                                                         <Button.ContextMenu>
                                                             <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                                                <ContextMenu.Resources>
-                                                                    <Style TargetType="MenuItem">
-                                                                        <Style.Triggers><DataTrigger Binding="{Binding Port}" Value="{x:Null}">
-                                                                            <Setter Property="IsEnabled" Value="False"/>
-                                                                        </DataTrigger></Style.Triggers>
-                                                                    </Style>
-                                                                </ContextMenu.Resources>
-                                                                <MenuItem Header="Монитор порта" Click="cmdMonitor_Clicked"/>
-                                                                <MenuItem Header="Открыть журнал порта" Click="cmdLog_Clicked"/>
+                                                                <MenuItem Header="Монитор порта" Click="cmdMonitor_Clicked" IsEnabled="{Binding Connected}"/>
+                                                                <MenuItem Header="Журнал последней записи строки" Click="cmdLog_Clicked" IsEnabled="{Binding HasLog}"/>
                                                                 <Separator/>
-                                                                <MenuItem Header="Настройки платы" Click="cmd_Settings_Clicked" ToolTip="Доступно после чтения MAC при прошивке" ToolTipService.ShowOnDisabled="True">
-                                                                    <MenuItem.Style><Style TargetType="MenuItem"><Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding flMAC}" Value="{x:Null}"><Setter Property="IsEnabled" Value="False"/></DataTrigger>
-                                                                    </Style.Triggers></Style></MenuItem.Style>
-                                                                </MenuItem>
+                                                                <MenuItem Header="Локальный пресет SmartKitchen" Click="cmd_Settings_Clicked" IsEnabled="{Binding CanEditPreset}"
+                                                                          ToolTip="Для успешно прошитой платы SmartKitchen с известным MAC" ToolTipService.ShowOnDisabled="True"/>
                                                             </ContextMenu>
                                                         </Button.ContextMenu>
                                                     </Button>
@@ -134,6 +124,7 @@
                                                                 <DataTrigger Binding="{Binding Ready}" Value="True"><Setter Property="Fill" Value="#398A83"/></DataTrigger>
                                                                 <DataTrigger Binding="{Binding Stage}" Value="Writing"><Setter Property="Fill" Value="#BD710C"/></DataTrigger>
                                                                 <DataTrigger Binding="{Binding Stage}" Value="Success"><Setter Property="Fill" Value="#228158"/></DataTrigger>
+                                                                <DataTrigger Binding="{Binding Stage}" Value="Historical"><Setter Property="Fill" Value="#747F81"/></DataTrigger>
                                                                 <DataTrigger Binding="{Binding Stage}" Value="Failure"><Setter Property="Fill" Value="#BC403B"/></DataTrigger>
                                                             </Style.Triggers>
                                                         </Style></Ellipse.Style>
@@ -185,7 +176,7 @@
                                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                                 <DockPanel>
                                     <Button x:Name="btn_Close_COM" DockPanel.Dock="Right" Style="{StaticResource Action}" MinHeight="24" Padding="7,2"
-                                            FontSize="12" Content="Остановить" Visibility="Collapsed" Click="btn_Close_COM_Click"/>
+                                            FontSize="12" Content="Остановить мониторы" Visibility="Collapsed" Click="btn_Close_COM_Click"/>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Style="{StaticResource Glyph}" Text="&#xE756;" Foreground="#86D8B7" Margin="0,0,7,0"/>
                                         <TextBlock Text="Журнал" FontSize="17" FontWeight="SemiBold" Foreground="White"/>
@@ -193,9 +184,13 @@
                                 </DockPanel>
                                 <TextBlock x:Name="logSource" Grid.Row="1" Foreground="#ACCCC3" Margin="0,4,0,8" FontSize="12" Text="Вывод esptool и COM-порта"/>
                                 <Grid Grid.Row="2" Height="178">
-                                    <TextBox x:Name="txt_log" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                                             Background="Transparent" Foreground="#E1F1EA" BorderThickness="0" Padding="0" FontFamily="Consolas" FontSize="13"
-                                             AutomationProperties.Name="Журнал операций"/>
+                                    <DockPanel>
+                                        <TextBlock x:Name="partialLog" DockPanel.Dock="Bottom" MaxHeight="48" TextTrimming="CharacterEllipsis"
+                                                   Foreground="#E1F1EA" FontFamily="Consolas" FontSize="13" Visibility="Collapsed"/>
+                                        <TextBox x:Name="txt_log" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                                 Background="Transparent" Foreground="#E1F1EA" BorderThickness="0" Padding="0" FontFamily="Consolas" FontSize="13"
+                                                 AutomationProperties.Name="Журнал операций"/>
+                                    </DockPanel>
                                     <TextBlock Text="Ожидание вывода…" IsHitTestVisible="False" FontFamily="Consolas" FontSize="13" Foreground="#AFBFBA">
                                         <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers>
                                             <DataTrigger Binding="{Binding Text, ElementName=txt_log}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger>

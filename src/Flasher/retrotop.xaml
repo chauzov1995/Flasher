@@ -12,6 +12,13 @@
                     <StackPanel Grid.Column="1" Margin="6,0,0,0"><TextBlock Text="GPIO кнопки" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
                         <TextBox x:Name="txt_numBUTTON" AutomationProperties.Name="GPIO кнопки"/></StackPanel>
                 </Grid>
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,6,0"><TextBlock Text="GPIO второго выхода" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txt_numPIN2" AutomationProperties.Name="GPIO второго выхода"/></StackPanel>
+                    <StackPanel Grid.Column="1" Margin="6,0,0,0"><TextBlock Text="GPIO второй кнопки" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                        <TextBox x:Name="txt_numBUTTON2" AutomationProperties.Name="GPIO второй кнопки"/></StackPanel>
+                </Grid>
                 <CheckBox x:Name="chk_mechanicBtn" Content="Механическая кнопка" MinHeight="31"/>
             </StackPanel>
         </Border>

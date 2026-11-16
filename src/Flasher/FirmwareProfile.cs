@@ -26,7 +26,9 @@ public sealed class FirmwareProfile
         _ => Desc ?? NameDir
     };
 
-    [JsonIgnore] public string Label => Title + (Erase ? " (полное стирание)" : "");
+    [JsonIgnore] public string Label => Title + (Erase ? " (полное стирание)" : "") +
+        (ValidationError == null ? "" : " (комплект недоступен)");
+    [JsonIgnore] public string ValidationError { get; internal set; }
 
     private string directory;
     private static readonly JsonSerializerOptions Options = new()
@@ -58,6 +60,12 @@ public sealed class FirmwareProfile
 
     public ProcessStartInfo CreateFlashCommand(string root, string port, bool erase)
     {
+        using var package = Prepare(root, port, erase);
+        return package.Command;
+    }
+
+    internal FlashPackage Prepare(string root, string port, bool erase)
+    {
         var tools = Path.Combine(root, "partsheme");
         var layoutDir = Layout switch
         {
@@ -80,14 +88,8 @@ public sealed class FirmwareProfile
             "--flash_size", "4MB"
         };
         if (Erase || erase) args.Add("--erase-all");
-        args.AddRange(new[]
-        {
-            "0x1000", RequiredFile(layoutDir, Bootloader),
-            "0x8000", RequiredFile(layoutDir, Partitions),
-            "0xe000", RequiredFile(tools, "boot_app0.bin"),
-            "0x10000", RequiredFile(directory, BinName)
-        });
         foreach (var arg in args) command.ArgumentList.Add(arg);
-        return command;
+        return new FlashPackage(command, RequiredFile(layoutDir, Bootloader), RequiredFile(layoutDir, Partitions),
+            RequiredFile(tools, "boot_app0.bin"), RequiredFile(directory, BinName));
     }
 }

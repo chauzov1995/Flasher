@@ -3,24 +3,20 @@
         MinWidth="590" MinHeight="420" WindowStartupLocation="CenterOwner" Background="{StaticResource Paper}" Foreground="{StaticResource Ink}">
     <DockPanel Margin="20">
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-            <TextBlock Text="Настройки платы" FontSize="26" FontWeight="SemiBold"/>
-            <TextBlock Text="Изменения пресета действуют до закрытия окна." Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+            <TextBlock Text="Локальный пресет" FontSize="26" FontWeight="SemiBold"/>
+            <TextBlock Text="Сохраняется на этом компьютере для выбранной модели и MAC. Передача на плату не выполняется." Style="{StaticResource Caption}" Margin="0,4,0,0"/>
         </StackPanel>
-        <Button x:Name="btn_Post" DockPanel.Dock="Bottom" Style="{StaticResource Action}" Content="Закрыть" Margin="0,12,0,0"
-                Click="btn_Post_Click" IsCancel="True" HorizontalAlignment="Right"/>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Style="{StaticResource Quiet}" Content="Отмена" IsCancel="True" Margin="0,0,8,0"/>
+            <Button x:Name="btn_Post" Style="{StaticResource Primary}" Content="Сохранить пресет" Click="btn_Post_Click" IsDefault="True"/>
+        </StackPanel>
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition Width="190"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <Border Style="{StaticResource Pane}" Padding="10">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="Пресет" Style="{StaticResource SectionTitle}" Margin="4,0,0,10"/>
-                    <ListView x:Name="lb_preview" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="lb_preview_SelectionChanged">
-                        <ListView.ItemTemplate><DataTemplate>
-                            <StackPanel Margin="2,4"><Image Source="{Binding ImagePath}" Width="126" Height="72" Stretch="Uniform"/>
-                                <TextBlock Text="{Binding imgName}" FontWeight="SemiBold" Margin="0,4,0,0"/>
-                            </StackPanel>
-                        </DataTemplate></ListView.ItemTemplate>
-                    </ListView>
-                </DockPanel>
+                <StackPanel>
+                    <Image x:Name="picture" Height="78" Stretch="Uniform" Margin="4"/>
+                    <TextBlock x:Name="model" FontWeight="SemiBold" Margin="4" TextWrapping="Wrap"/>
+                </StackPanel>
             </Border>
             <Border Grid.Column="1" Style="{StaticResource Pane}" Padding="14" Margin="12,0,0,0">
                 <DockPanel>

@@ -1,81 +1,37 @@
-using System;
 using System.Windows;
 
-namespace WpfApp1
+namespace WpfApp1;
+
+public partial class Svet : Window
 {
-    /// <summary>
-    /// Логика взаимодействия для svet.xaml
-    /// </summary>
-    public partial class Svet : Window
+    private readonly DeviceIOT device;
+
+    public Svet(DeviceIOT device)
     {
-        DeviceIOT t;
-
-        public Svet(DeviceIOT param)
-        {
-            InitializeComponent();
-
-            t = param;
-
-            ShowElement();
-
-        }
-
-        public void ShowElement()
-        {
-            txt_numPIN.Clear();
-            txt_numBUTTON.Clear();
-            if (t.numButton.ToString() != ""&& t.numPIN.ToString()!="") //если заполнены были поля
-            {
-
-                txt_numPIN.Text = t.numPIN.ToString();
-                txt_numBUTTON.Text = t.numButton.ToString();
-
-                if (t.reverseBULB == true) chk_reverseBULB.IsChecked = true;
-                if (t.dimBRIGHTNESS == true) chk_dimBRIGHTNESS.IsChecked = true;
-                if (t.SMOTH == true) chk_SMOTH.IsChecked = true;
-                if (t.IKsenor == true) chk_IKsenor.IsChecked = true;
-            }
-        }
-
-        private void btn_Save_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (int.TryParse(txt_numPIN.Text, out var pin) && int.TryParse(txt_numBUTTON.Text, out var button))
-            {
-
-                t.numPIN = pin;
-                t.numButton = button;
-
-                 if (chk_reverseBULB.IsChecked == true)
-                    t.reverseBULB = true;
-                 else
-                    t.reverseBULB = false;
-
-
-                 if (chk_dimBRIGHTNESS.IsChecked == true)
-                    t.dimBRIGHTNESS = true;
-                else t.dimBRIGHTNESS = false;
-
-
-                 if (chk_SMOTH.IsChecked == true)
-                    t.SMOTH = true;
-                else t.SMOTH = false;
-
-
-                 if (chk_IKsenor.IsChecked == true)
-                    t.IKsenor = true;
-                 else t.IKsenor = false;
-
-                this.Close();
-            }
-            else
-                MessageBox.Show("Заполните PIN и укажите кнопку!", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
-
-
-        }
-
-
+        InitializeComponent();
+        this.device = device;
+        txt_numPIN.Text = device.numPIN.ToString();
+        txt_numBUTTON.Text = device.numButton.ToString();
+        chk_reverseBULB.IsChecked = device.reverseBULB;
+        chk_dimBRIGHTNESS.IsChecked = device.dimBRIGHTNESS;
+        chk_SMOTH.IsChecked = device.SMOTH;
+        chk_IKsenor.IsChecked = device.IKsenor;
     }
 
-
+    private void btn_Save_Click(object sender, RoutedEventArgs e)
+    {
+        if (!int.TryParse(txt_numPIN.Text, out var numPIN) || !DeviceIOT.ValidGpio(numPIN, true) ||
+            !int.TryParse(txt_numBUTTON.Text, out var numButton) || !DeviceIOT.ValidGpio(numButton, false))
+        {
+            MessageBox.Show(this, "Проверьте GPIO выходов и кнопок. GPIO 34–39 доступны только для входа.", Title);
+            return;
+        }
+        device.numPIN = numPIN;
+        device.numButton = numButton;
+        device.reverseBULB = chk_reverseBULB.IsChecked == true;
+        device.dimBRIGHTNESS = chk_dimBRIGHTNESS.IsChecked == true;
+        device.SMOTH = chk_SMOTH.IsChecked == true;
+        device.IKsenor = chk_IKsenor.IsChecked == true;
+        Close();
+    }
 }

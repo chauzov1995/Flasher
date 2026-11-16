@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>WpfApp1</RootNamespace>
+    <StartupObject>WpfApp1.RegressionChecks</StartupObject>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/Flasher/**/*.cs" Exclude="../../src/Flasher/bin/**;../../src/Flasher/obj/**"/>
+    <ApplicationDefinition Include="../../src/Flasher/App.xaml" Link="App.xaml"/>
+    <Page Include="../../src/Flasher/*.xaml" Exclude="../../src/Flasher/App.xaml" Link="%(Filename)%(Extension)"/>
+  </ItemGroup>
+</Project>
