@@ -20,7 +20,22 @@ Windows-программа для записи готовых заводских
 | Заводские для прежней интеграции Google IoT Core | Co2Sta, SmartKitchen |
 | Тестовые | TEST, testfenster, testteplica, testirovanieFan |
 
-Описания находятся в `projects/<профиль>/ino.json`. У теста вентилятора описание и готовый образ лежат рядом со скетчем в `projectsard/testirovanieFan/`. Исходники скетчей для остальных профилей в эту поставку не входят.
+Готовые комплекты находятся в `projects/<профиль>/`. Исходники трёх тестовых прошивок хранятся в `projectsard/`.
+
+| Профиль Flasher | Arduino-скетч | Дополнительные библиотеки |
+| --- | --- | --- |
+| testfenster | [fenster2_testprosh.ino](projectsard/fenster2_testprosh/fenster2_testprosh.ino) | INA226 0.6.6 (Rob Tillaart) |
+| testteplica | [teplica2_testprosh.ino](projectsard/teplica2_testprosh/teplica2_testprosh.ino) | INA219 0.4.2 (Rob Tillaart), OneWire 2.3.8, DallasTemperature 4.0.6 |
+| testirovanieFan | [testirovanieFan.ino](projectsard/testirovanieFan/testirovanieFan.ino) | DFRobot_SHT20, Adafruit_CCS811 |
+
+У теста вентилятора описание и готовый образ лежат рядом со скетчем. Для первых двух скетчей в Arduino IDE выберите **ESP32 Dev Module**, flash 4 МБ, частоту flash 80 МГц, режим QIO и схему **Minimal SPIFFS (1.9MB APP with OTA/128KB SPIFFS)**. Эти параметры взяты из исходных экспортов Arduino. Параметры записи esptool из тех же экспортов — DIO, 80 МГц, 4 МБ. Из корня репозитория можно проверить сборку командами ниже, установив ядро esp32 3.3.12 и библиотеки из таблицы.
+
+```powershell
+arduino-cli compile --fqbn esp32:esp32:esp32:FlashMode=qio,FlashFreq=80,FlashSize=4M,PartitionScheme=min_spiffs projectsard/fenster2_testprosh
+arduino-cli compile --fqbn esp32:esp32:esp32:FlashMode=qio,FlashFreq=80,FlashSize=4M,PartitionScheme=min_spiffs projectsard/teplica2_testprosh
+```
+
+В профили перенесены готовые экспорты из истории Giulia-Novars-Smart. Для Fenster скетч и экспорт соответствуют ревизии `386acd2`. Для Teplica экспорт взят из `c2df0c5`, а скетч — из последующей `0d84b5c`, где добавлена передача измеренной температуры в отчёте. Чтобы использовать эту правку на стенде, потребуется отдельно выпустить и проверить новую сборку. Оба скетча содержат настройки Wi-Fi стенда.
 
 ## Сборка и поставка
 
