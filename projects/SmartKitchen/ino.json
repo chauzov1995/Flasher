@@ -1,9 +1,13 @@
 {
-"binname": "SmartKitchen.ino.pico32.bin",
-"nameDir": "SmartKitchen",
-"name": "SmartKitchen",
-"desc": "SmartKitchen (устар гугл иот коре)",
-"prefix":"GN_",
-"intver": 0,
-"project": "giulia-novars-smart-realtime",
+  "binname": "SmartKitchen.ino.pico32.bin",
+  "nameDir": "SmartKitchen",
+  "name": "SmartKitchen",
+  "desc": "SmartKitchen (устар гугл иот коре)",
+  "prefix": "GN_",
+  "intver": 0,
+  "project": "giulia-novars-smart-realtime",
+  "kind": "factory",
+  "layout": "1.0.4.rc1",
+  "bootloader": "bootloader_dio_80m.bin",
+  "partitions": "partitions.bin"
 }

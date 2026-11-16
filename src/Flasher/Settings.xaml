@@ -1,0 +1,60 @@
+<Window x:Class="WpfApp1.Settings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Settings" Height="625" Width="908">
+    <Grid Margin="5,5,10,5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="585*"/>
+            <ColumnDefinition Width="308*"/>
+
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="lb_settings" Margin="10,19,21,55">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:Name="DataTemplateSettings">
+                    <StackPanel Orientation="Vertical" Margin="1">
+                        <StackPanel Orientation="Horizontal" Margin="1">
+                            <TextBlock Text="{Binding num}" VerticalAlignment="Center" Margin="3,0,6,3"/>
+                            <ComboBox Text="{Binding Type}"  Margin="2,2,2,2" ItemsSource="{Binding TypesDevicesSettings}" Width="128" />
+                            <Button Content="Редактировать" Margin="5,0,0,0" Click="cmd_Edit_Clicked" Height="24"/>
+                            <!--Text="{Binding Devices}"-->
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="1">
+                            <Label Content="{Binding Opisanie}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
+
+        <Button x:Name="btn_Post" Content="Закрыть" Margin="0,0,11,23" Width="80" Height="20" Click="btn_Post_Click" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1"/>
+
+        <ListView x:Name="lb_preview" Margin="20,19,10,55" Grid.Column="1" SelectionChanged="lb_preview_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate x:Name="DataPreview">
+                    <StackPanel Orientation="Vertical">
+
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <Image Source="{Binding ImagePath}" Height="200" Width="200" Stretch="Uniform"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding imgName}" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="3,3,3,3"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+
+
+
+
+    </Grid>
+</Window>

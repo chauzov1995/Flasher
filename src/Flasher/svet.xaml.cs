@@ -1,0 +1,81 @@
+using System;
+using System.Windows;
+
+namespace WpfApp1
+{
+    /// <summary>
+    /// Логика взаимодействия для svet.xaml
+    /// </summary>
+    public partial class Svet : Window
+    {
+        DeviceIOT t;
+
+        public Svet(DeviceIOT param)
+        {
+            InitializeComponent();
+
+            t = param;
+
+            ShowElement();
+
+        }
+
+        public void ShowElement()
+        {
+            txt_numPIN.Clear();
+            txt_numBUTTON.Clear();
+            if (t.numButton.ToString() != ""&& t.numPIN.ToString()!="") //если заполнены были поля
+            {
+
+                txt_numPIN.Text = t.numPIN.ToString();
+                txt_numBUTTON.Text = t.numButton.ToString();
+
+                if (t.reverseBULB == true) chk_reverseBULB.IsChecked = true;
+                if (t.dimBRIGHTNESS == true) chk_dimBRIGHTNESS.IsChecked = true;
+                if (t.SMOTH == true) chk_SMOTH.IsChecked = true;
+                if (t.IKsenor == true) chk_IKsenor.IsChecked = true;
+            }
+        }
+
+        private void btn_Save_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (int.TryParse(txt_numPIN.Text, out var pin) && int.TryParse(txt_numBUTTON.Text, out var button))
+            {
+
+                t.numPIN = pin;
+                t.numButton = button;
+
+                 if (chk_reverseBULB.IsChecked == true)
+                    t.reverseBULB = true;
+                 else
+                    t.reverseBULB = false;
+
+
+                 if (chk_dimBRIGHTNESS.IsChecked == true)
+                    t.dimBRIGHTNESS = true;
+                else t.dimBRIGHTNESS = false;
+
+
+                 if (chk_SMOTH.IsChecked == true)
+                    t.SMOTH = true;
+                else t.SMOTH = false;
+
+
+                 if (chk_IKsenor.IsChecked == true)
+                    t.IKsenor = true;
+                 else t.IKsenor = false;
+
+                this.Close();
+            }
+            else
+                MessageBox.Show("Заполните PIN и укажите кнопку!", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+
+
+        }
+
+
+    }
+
+
+}

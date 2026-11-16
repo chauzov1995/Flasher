@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>WpfApp1</AssemblyName>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <RootNamespace>WpfApp1</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="10.0.12" />
+    <Content Include="../../projects/**/*.bin;../../projects/**/ino.json;../../projectsard/**/*.bin;../../projectsard/**/ino.json;../../img/*.jpg;../../partsheme/esptool.exe;../../partsheme/boot_app0.bin;../../partsheme 1.0.4.rc1/*.bin"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest">
+      <Link>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)/../..', '%(FullPath)'))</Link>
+    </Content>
+  </ItemGroup>
+</Project>

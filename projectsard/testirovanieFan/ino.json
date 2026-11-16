@@ -1,0 +1,10 @@
+{
+  "nameDir": "testirovanieFan",
+  "name": "testirovanieFan",
+  "desc": "testirovanieFan (автообновление Fan после теста)",
+  "kind": "test",
+  "binname": "testirovanieFan.ino.pico32.bin",
+  "layout": "1.0.4.rc1",
+  "bootloader": "bootloader_dio_80m.bin",
+  "partitions": "partitions.bin"
+}

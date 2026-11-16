@@ -1,9 +1,13 @@
 {
-"binname": "Co2Sta.ino.pico32.bin",
-"nameDir": "Co2Sta",
-"name": "Co2Sta",
-"desc": "Co2Sta (устар гугл иот коре)",
-"prefix":"GV_",
-"intver": 0,
-"project": "greenvent-632e2",
+  "binname": "Co2Sta.ino.pico32.bin",
+  "nameDir": "Co2Sta",
+  "name": "Co2Sta",
+  "desc": "Co2Sta (устар гугл иот коре)",
+  "prefix": "GV_",
+  "intver": 0,
+  "project": "greenvent-632e2",
+  "kind": "factory",
+  "layout": "1.0.4.rc1",
+  "bootloader": "bootloader_dio_80m.bin",
+  "partitions": "partitions.bin"
 }

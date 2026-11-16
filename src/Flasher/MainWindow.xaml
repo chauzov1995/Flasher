@@ -1,0 +1,67 @@
+<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Flasher" Height="524" Width="1080" Closed="Window_Closed">
+    <Grid Margin="-13,1,8,7">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="329*"/>
+            <RowDefinition Height="130"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="513*"/>
+            <ColumnDefinition Width="306*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="Update" Content="Обновить" Grid.Column="1" Margin="0,50,10,0" VerticalAlignment="Top" Click="Update_Click" Background="#FF5DA3DE" Height="40" Grid.Row="2" HorizontalAlignment="Right" Width="80"/>
+        <Button x:Name="Clear" Content="Очистить поля" Grid.Column="1" HorizontalAlignment="Right" Margin="0,50,100,0" VerticalAlignment="Top" Width="100" Click="Clear_Click" Background="#FFF75F5F" Height="40" Grid.Row="2"/>
+
+        <Button x:Name="flash_all" Content="Прошить все" Grid.Column="1" Margin="0,10,10,0" VerticalAlignment="Top" Background="#FFFB9E69" Foreground="#FF232323" Click="flash_all_Click" Height="20" Grid.Row="2" HorizontalAlignment="Right" Width="190"/>
+        <ListBox x:Name="lb"  Grid.ColumnSpan="2" Margin="25,10,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:Name="DoubleLineDataTemplate">
+
+                    <StackPanel Orientation="Vertical" Margin="3">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding elem}" Margin="2,2,2,2" VerticalAlignment="Center"/>
+                            <CheckBox  IsChecked="{Binding chk}"  Margin="2,2,2,2" VerticalAlignment="Center" />
+
+                            <ComboBox SelectedValue="{Binding Path, Mode=TwoWay}" SelectedValuePath="NameDir" ItemsSource="{Binding DirectoryProject}" DisplayMemberPath="Label" Margin="3" Width="250" Height="25" Padding="2"/>
+
+                            <!--<Button Content="->" Margin="5,3,3,3" VerticalAlignment="Top" Width="25"  Height="25" Click="cmdOpen_Clicked"/>-->
+                            <ComboBox SelectedItem="{Binding Port, Mode=TwoWay}" Margin="5,3,3,3" Width="100" Height="25" ItemsSource="{Binding portNames}"/>
+
+                            <Button Content="Прошить" Margin="5,3,3,3" VerticalAlignment="Top" Width="95" Background="#FFFB9E69" Foreground="#FF232323" Height="25" Click="cmdFlash_Clicked"/>
+                            <Button Content="log" Margin="5,3,3,3" VerticalAlignment="Top" Width="40" Background="#cccccc" Foreground="#FF232323" Height="25" Click="cmdLog_Clicked"/>
+                            <Button Content="Монитор" Margin="5,3,3,3" VerticalAlignment="Top" Width="60" Background="DeepSkyBlue" Foreground="#FF232323" Height="25" Click="cmdMonitor_Clicked"/>
+                            <Button Content="Настройки" Margin="5,3,3,3" VerticalAlignment="Top" Width="80" Background="LightGray" Foreground="#FF232323" Height="25" Click="cmd_Settings_Clicked"/>
+                        </StackPanel>
+                        <!--MAC COM-->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontWeight="Bold" Text="MAC:" Foreground="DarkOrange" Margin="35,0,0,0"/>
+                            <TextBlock FontWeight="Bold" Text="{Binding flMAC}" Foreground="#222222" Margin="4,0,0,0"/>
+                            <TextBlock FontWeight="Bold" Text="{Binding status}" Foreground="#e80000" Margin="20,0,0,0"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <CheckBox x:Name="chk_noClose" ToolTip="Открыть файл вывода esptool после завершения" Content="Открывать журнал" HorizontalAlignment="Left" Margin="31,10,0,0" VerticalAlignment="Top" Grid.Row="2"/>
+        <TextBox x:Name="txt_log" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Margin="0,10,10,10" Text="Вывод информации" TextWrapping="Wrap" Grid.Column="2" Grid.Row="1"/>
+        <TextBox x:Name="txt_err" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Margin="0,10,10,10" Text="Результаты тестов" TextWrapping="Wrap" Grid.Column="2" Grid.Row="2"/>
+
+        <CheckBox x:Name="chk_all" ToolTip="Установить либо снять все галочки" Content="Все" HorizontalAlignment="Left" Margin="25,0,0,0" Click="chk_all_Click" RenderTransformOrigin="1.965,-0.66" Height="15" VerticalAlignment="Center"/>
+        <CheckBox x:Name="chk_erase" ToolTip="Профили с пометкой «полное стирание» очищают всю flash при любом положении флажка." Content="Очищать при прошивке" HorizontalAlignment="Left" Margin="31,30,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+        <Button x:Name="btn_Close_COM" ToolTip="Остановить чтение из COM порта" Content="Х COM" Grid.Column="1" Margin="0,100,10,0" Grid.Row="2" VerticalAlignment="Top" Click="btn_Close_COM_Click" HorizontalAlignment="Right" Width="79"/>
+        <CheckBox x:Name="chk_erase_Copy" Content="Монитор порта после прошивки" HorizontalAlignment="Left" Margin="31,50,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+
+
+
+
+    </Grid>
+</Window>

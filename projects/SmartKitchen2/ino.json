@@ -1,11 +1,12 @@
 {
-"binname": "SmartKitchen2.ino.bin",
-"bootloader": "SmartKitchen2.ino.bootloader.bin",
-"partitions": "SmartKitchen2.ino.partitions.bin",
-"nameDir": "SmartKitchen2",
-"name": "SmartKitchen2",
-"desc": "SmartKitchen2",
-"prefix":"GN_",
-"intver": 1,
-"project": "giulia-novars-smart-realtime",
+  "binname": "SmartKitchen2.ino.bin",
+  "bootloader": "SmartKitchen2.ino.bootloader.bin",
+  "partitions": "SmartKitchen2.ino.partitions.bin",
+  "nameDir": "SmartKitchen2",
+  "name": "SmartKitchen2",
+  "desc": "SmartKitchen2",
+  "prefix": "GN_",
+  "intver": 1,
+  "project": "giulia-novars-smart-realtime",
+  "kind": "factory"
 }
