@@ -19,12 +19,14 @@ public sealed class FirmwareProfile
     public bool Erase { get; set; }
 
     [JsonIgnore]
-    public string Label => (Kind switch
+    public string Title => Kind switch
     {
         "test" => $"Тест · {Desc ?? NameDir}",
         "factory" => $"Заводская · {Desc ?? NameDir}",
         _ => Desc ?? NameDir
-    }) + (Erase ? " (полное стирание)" : "");
+    };
+
+    [JsonIgnore] public string Label => Title + (Erase ? " (полное стирание)" : "");
 
     private string directory;
     private static readonly JsonSerializerOptions Options = new()

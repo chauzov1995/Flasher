@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -18,9 +19,22 @@ namespace WpfApp1
     /// Логика взаимодействия для Settings.xaml
     /// </summary>
     ///
-    public class DeviceIOT    {
+    public class DeviceIOT : INotifyPropertyChanged
+    {
 
-        public string Type { get; set; }
+        private string type;
+        public string Type
+        {
+            get => type;
+            set
+            {
+                if (type == value) return;
+                type = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Type)));
+                ShowSettingSvet();
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public string[] TypesDevicesSettings { get; set; }
 
@@ -40,34 +54,17 @@ namespace WpfApp1
         public void ShowSettingSvet()
         {
 
-            //Listedevice[i].Opisanie = $"PIN {Listedevice[i].numPIN }, Button {Listedevice[i].numButton}, ";
-            Opisanie = "Выбрано:\n";
-
-            switch (Type)
+            var options = new List<string>();
+            if (Type == "svet")
             {
-                case "svet":
-                    if (reverseBULB == true)
-                        Opisanie += "Инвертировать, ";
-
-
-                    if (dimBRIGHTNESS == true)
-                        Opisanie += "Регулировка яркости, ";
-
-
-                    if (SMOTH == true)
-                        Opisanie += "Плавное включение, ";
-
-
-                    if (IKsenor == true)
-                        Opisanie += "ИК сенсор ";
-                    break;
-                case "retrotop_up":
-                    if (MechanicBtn == true)
-                        Opisanie += "Механическая кнопка";
-                    break;
+                if (reverseBULB) options.Add("Инверсия выхода");
+                if (dimBRIGHTNESS) options.Add("Регулировка яркости");
+                if (SMOTH) options.Add("Плавное включение");
+                if (IKsenor) options.Add("ИК-датчик");
             }
-            Opisanie= Opisanie == "Выбрано:\n" ?  "" :  Opisanie ;
-            Opisanie = Opisanie.Trim();
+            if (Type == "retrotop_up" && MechanicBtn) options.Add("Механическая кнопка");
+            Opisanie = string.Join(" · ", options);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Opisanie)));
         }
 
 
@@ -186,13 +183,13 @@ namespace WpfApp1
                 {
 
                     case "svet":
-                        Svet sv = new Svet(msg);
+                        Svet sv = new Svet(msg) { Owner = this };
                         sv.ShowDialog();
                         msg.ShowSettingSvet();
                         break;
 
                     case "retrotop_up":
-                        Retrotop rt = new Retrotop(msg);
+                        Retrotop rt = new Retrotop(msg) { Owner = this };
                         rt.ShowDialog();
                         msg.ShowSettingSvet();
                         break;

@@ -6,25 +6,13 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Windows.Controls.Primitives;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace WpfApp1;
-
-public sealed class FlashInfo
-{
-    public string Path { get; set; }
-    public string Port { get; set; }
-    public bool chk { get; set; }
-    [JsonIgnore] public int elem { get; set; }
-    [JsonIgnore] public string flMAC { get; set; }
-    [JsonIgnore] public string status { get; set; }
-    [JsonIgnore] public string[] portNames { get; set; }
-    [JsonIgnore] public List<FirmwareProfile> DirectoryProject { get; set; }
-}
 
 public partial class MainWindow : Window
 {
@@ -49,7 +37,6 @@ public partial class MainWindow : Window
         chk_erase.IsChecked = settings.erase;
         chk_erase_Copy.IsChecked = settings.monitoe;
         chk_noClose.IsChecked = settings.noClosing;
-        lb.ItemsSource = rows;
         RefreshCatalog();
     }
 
@@ -79,19 +66,65 @@ public partial class MainWindow : Window
             }
         }
 
-        var ports = SerialPort.GetPortNames();
+        var ports = SerialPort.GetPortNames().OrderBy(p => p.Length).ThenBy(p => p).ToArray();
         if (ports.Length == 0) messages.Add("COM-порты не обнаружены. Подключите плату и нажмите «Обновить».");
+        portSummary.Text = $"COM-порты: {ports.Length}";
+        portIndicator.Fill = ports.Length > 0 ? (Brush)FindResource("Accent") : Brushes.DarkGray;
+        profileSummary.Text = $"Профили: {profiles.Count}";
+        logSource.Text = "Вывод esptool и COM-порта";
         txt_log.Text = string.Join(Environment.NewLine, messages);
+        lb.ItemsSource = null;
         for (var i = 0; i < rows.Count; i++)
         {
             var row = rows[i];
+            row.PropertyChanged -= Row_Changed;
             row.elem = i + 1;
             row.DirectoryProject = profiles;
             row.portNames = ports;
             if (!ports.Contains(row.Port)) row.Port = null;
             if (!profiles.Any(p => p.NameDir == row.Path)) row.Path = null;
+            row.PropertyChanged += Row_Changed;
         }
-        lb.Items.Refresh();
+        lb.ItemsSource = rows;
+        UpdateSelection();
+    }
+
+    private void Row_Changed(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FlashInfo.chk) || e.PropertyName == nameof(FlashInfo.Ready))
+            UpdateSelection();
+    }
+
+    private void UpdateSelection()
+    {
+        var selected = rows.Where(r => r.chk).ToArray();
+        chk_all.IsChecked = selected.Length == 0 ? false : selected.Length == rows.Count ? true : null;
+        selectionSummary.Text = $"Выбрано: {selected.Length} из {rows.Count}";
+        var incomplete = selected.FirstOrDefault(r => !r.Ready);
+        var duplicate = selected.Where(r => r.Ready).GroupBy(r => r.Port).FirstOrDefault(g => g.Count() > 1);
+        string hint = "";
+        if (incomplete != null) hint = $"Строка {incomplete.elem:00}: выберите прошивку и COM-порт.";
+        else if (duplicate != null) hint = $"Порт {duplicate.Key} выбран несколько раз.";
+        selectionHint.Text = hint;
+        selectionHint.Visibility = hint.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+        flash_all.IsEnabled = selected.Length > 0 && hint.Length == 0;
+    }
+
+    private void Workspace_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        bool compact = e.NewSize.Width < 940;
+        railColumn.Width = new GridLength(compact ? 0 : 318);
+        Grid.SetColumn(rail, compact ? 0 : 1);
+        Grid.SetRow(rail, compact ? 1 : 0);
+        rail.Margin = compact ? new Thickness(0, 14, 0, 0) : new Thickness(16, 0, 0, 0);
+    }
+
+    private void RowMenu_Click(object sender, RoutedEventArgs e)
+    {
+        var button = (Button)sender;
+        button.ContextMenu.PlacementTarget = button;
+        button.ContextMenu.Placement = PlacementMode.Bottom;
+        button.ContextMenu.IsOpen = true;
     }
 
     private void Update_Click(object sender, RoutedEventArgs e)
@@ -105,6 +138,7 @@ public partial class MainWindow : Window
         if (MessageBox.Show("Очистить выбор прошивок и COM-портов?", Title, MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             return;
         CloseMonitor();
+        txt_err.Clear();
         rows.Clear();
         for (int i = 0; i < BoardCount; i++) rows.Add(new FlashInfo());
         chk_all.IsChecked = false;
@@ -113,12 +147,12 @@ public partial class MainWindow : Window
 
     private void chk_all_Click(object sender, RoutedEventArgs e)
     {
-        foreach (var row in rows) row.chk = chk_all.IsChecked == true;
-        lb.Items.Refresh();
+        bool select = rows.Any(row => !row.chk);
+        foreach (var row in rows) row.chk = select;
     }
 
     private async void cmdFlash_Clicked(object sender, RoutedEventArgs e) =>
-        await FlashAsync(new[] { (FlashInfo)((Button)sender).DataContext });
+        await FlashAsync(new[] { (FlashInfo)((FrameworkElement)sender).DataContext });
 
     private async void flash_all_Click(object sender, RoutedEventArgs e) =>
         await FlashAsync(rows.Where(row => row.chk).ToArray());
@@ -127,7 +161,7 @@ public partial class MainWindow : Window
     {
         if (flashing) return;
         flashing = true;
-        ((UIElement)Content).IsEnabled = false;
+        queuePanel.IsEnabled = writeOptions.IsEnabled = Update.IsEnabled = false;
         try
         {
             var ports = SerialPort.GetPortNames();
@@ -147,30 +181,36 @@ public partial class MainWindow : Window
             txt_err.Clear();
             foreach (var (row, command) in jobs)
             {
-                row.status = "Прошивка…";
+                row.SetStage(FlashStage.Writing);
+                logSource.Text = $"Запись · {row.Path} · {row.Port}";
                 row.flMAC = null;
-                lb.Items.Refresh();
                 txt_log.Clear();
                 try
                 {
                     var exitCode = await RunTool(row, command);
-                    row.status = exitCode == 0 ? "Прошито" : $"Ошибка esptool ({exitCode})";
-                    if (chk_noClose.IsChecked == true) OpenLog(row.Port);
+                    row.SetStage(exitCode == 0 ? FlashStage.Success : FlashStage.Failure, $"Ошибка esptool ({exitCode})");
+                    logSource.Text = $"{row.Port} · {row.DisplayStatus}";
+                    if (chk_noClose.IsChecked == true)
+                    {
+                        try { OpenLog(row.Port); }
+                        catch (Exception ex) { txt_log.AppendText($"{Environment.NewLine}Журнал: {ex.Message}"); }
+                    }
                     if (exitCode == 0 && row == selected[^1] && chk_erase_Copy.IsChecked == true)
                         OpenMonitor(row.Port);
                 }
                 catch (Exception e)
                 {
-                    row.status = "Ошибка: " + e.Message;
+                    row.SetStage(FlashStage.Failure, "Ошибка: " + e.Message);
+                    logSource.Text = $"Ошибка записи · {row.Port}";
+                    txt_log.AppendText(Environment.NewLine + e.Message);
                 }
-                lb.Items.Refresh();
             }
         }
         catch (Exception e) { MessageBox.Show(e.Message, Title); }
         finally
         {
             flashing = false;
-            ((UIElement)Content).IsEnabled = true;
+            queuePanel.IsEnabled = writeOptions.IsEnabled = Update.IsEnabled = true;
         }
     }
 
@@ -201,7 +241,7 @@ public partial class MainWindow : Window
 
     private void cmdLog_Clicked(object sender, RoutedEventArgs e)
     {
-        var row = (FlashInfo)((Button)sender).DataContext;
+        var row = (FlashInfo)((FrameworkElement)sender).DataContext;
         try
         {
             if (string.IsNullOrEmpty(row.Port) || !File.Exists(LogPath(row.Port)))
@@ -219,6 +259,8 @@ public partial class MainWindow : Window
             monitor = new SerialPort(port, 115200);
             monitor.DataReceived += DataReceived;
             monitor.Open();
+            btn_Close_COM.Visibility = Visibility.Visible;
+            logSource.Text = $"Монитор · {port} · 115200 бод";
             txt_log.Text = $"{port} · 115200{Environment.NewLine}";
             txt_err.Clear();
         }
@@ -272,6 +314,8 @@ public partial class MainWindow : Window
         if (monitor == null) return;
         var previous = monitor;
         monitor = null;
+        btn_Close_COM.Visibility = Visibility.Collapsed;
+        logSource.Text = "Монитор остановлен";
         previous.DataReceived -= DataReceived;
         previous.Dispose();
         serialTail = "";
@@ -279,7 +323,7 @@ public partial class MainWindow : Window
 
     private void cmdMonitor_Clicked(object sender, RoutedEventArgs e)
     {
-        var row = (FlashInfo)((Button)sender).DataContext;
+        var row = (FlashInfo)((FrameworkElement)sender).DataContext;
         if (string.IsNullOrEmpty(row.Port)) MessageBox.Show("Выберите COM-порт.", Title);
         else OpenMonitor(row.Port);
     }
@@ -292,7 +336,7 @@ public partial class MainWindow : Window
 
     private void cmd_Settings_Clicked(object sender, RoutedEventArgs e)
     {
-        var row = (FlashInfo)((Button)sender).DataContext;
+        var row = (FlashInfo)((FrameworkElement)sender).DataContext;
         if (string.IsNullOrEmpty(row.flMAC)) MessageBox.Show("Сначала прошейте плату, чтобы прочитать MAC.", Title);
         else new Settings(row.elem - 1) { Title = $"Настройки · {row.flMAC}", Owner = this }.ShowDialog();
     }
