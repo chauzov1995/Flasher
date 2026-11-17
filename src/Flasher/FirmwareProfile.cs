@@ -16,6 +16,8 @@ public sealed class FirmwareProfile
     public string Bootloader { get; set; }
     public string Partitions { get; set; }
     public string Layout { get; set; }
+    public string Chip { get; set; } = "esp32";
+    public string FlashSize { get; set; } = "4MB";
     public bool Erase { get; set; }
 
     [JsonIgnore]
@@ -67,6 +69,11 @@ public sealed class FirmwareProfile
     internal FlashPackage Prepare(string root, string port, bool erase)
     {
         var tools = Path.Combine(root, "partsheme");
+        bool c6 = Chip == "esp32c6";
+        if (!(Chip == "esp32" && FlashSize == "4MB") && !(c6 && FlashSize == "8MB"))
+            throw new InvalidDataException($"Неподдерживаемая плата: {Chip}, flash {FlashSize}");
+        if (c6 && !string.IsNullOrEmpty(Layout))
+            throw new InvalidDataException("ESP32-C6 требует собственную таблицу и загрузчик комплекта");
         var layoutDir = Layout switch
         {
             null or "" => directory,
@@ -74,7 +81,7 @@ public sealed class FirmwareProfile
             _ => throw new InvalidDataException($"Неизвестная схема: {Layout}")
         };
 
-        var command = new ProcessStartInfo(RequiredFile(tools, "esptool.exe"))
+        var command = new ProcessStartInfo(RequiredFile(tools, c6 ? "esptool-c6.exe" : "esptool.exe"))
         {
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -83,13 +90,14 @@ public sealed class FirmwareProfile
         };
         var args = new List<string>
         {
-            "--chip", "esp32", "--port", port, "--baud", "921600", "--before", "default_reset",
-            "--after", "hard_reset", "write_flash", "-z", "--flash_mode", "dio", "--flash_freq", "80m",
-            "--flash_size", "4MB"
+            "--chip", Chip, "--port", port, "--baud", "921600", "--before", c6 ? "default-reset" : "default_reset",
+            "--after", c6 ? "hard-reset" : "hard_reset", c6 ? "write-flash" : "write_flash", "-z",
+            c6 ? "--flash-mode" : "--flash_mode", "dio", c6 ? "--flash-freq" : "--flash_freq", "80m",
+            c6 ? "--flash-size" : "--flash_size", FlashSize
         };
         if (Erase || erase) args.Add("--erase-all");
         foreach (var arg in args) command.ArgumentList.Add(arg);
         return new FlashPackage(command, RequiredFile(layoutDir, Bootloader), RequiredFile(layoutDir, Partitions),
-            RequiredFile(tools, "boot_app0.bin"), RequiredFile(directory, BinName));
+            RequiredFile(tools, "boot_app0.bin"), RequiredFile(directory, BinName), c6);
     }
 }

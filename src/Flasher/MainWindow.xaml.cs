@@ -274,9 +274,11 @@ public partial class MainWindow : Window
                     catch (IOException ex) { logError = ex; }
                 }
                 AppendLog($"[{row.Port}] {line}");
-                if (line.StartsWith("MAC: ", StringComparison.OrdinalIgnoreCase))
+                int macPrefix = line.StartsWith("BASE MAC: ", StringComparison.OrdinalIgnoreCase) ? 10 :
+                    line.StartsWith("MAC: ", StringComparison.OrdinalIgnoreCase) ? 5 : 0;
+                if (macPrefix != 0)
                 {
-                    var mac = line[5..].Trim().Replace(":", "").ToUpperInvariant();
+                    var mac = line[macPrefix..].Trim().Replace(":", "").ToUpperInvariant();
                     if (LocalPreset.ValidMac(mac)) row.flMAC = mac;
                 }
             }

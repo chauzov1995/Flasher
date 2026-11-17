@@ -1,0 +1,14 @@
+{
+  "binname": "green2_testprosh.ino.bin",
+  "bootloader": "green2_testprosh.ino.bootloader.bin",
+  "partitions": "green2_testprosh.ino.partitions.bin",
+  "nameDir": "testgreen2",
+  "name": "testgreen2",
+  "desc": "Green2 · регистрация, моторы выключены",
+  "prefix": "GN_",
+  "intver": 3,
+  "kind": "test",
+  "chip": "esp32c6",
+  "flashSize": "8MB",
+  "erase": true
+}

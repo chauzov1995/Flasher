@@ -1,0 +1,19 @@
+{
+  "firmware": "green2-test-1.0.2",
+  "builtUtc": "2026-11-17T19:35:48.1183363Z",
+  "fqbn": "esp32:esp32:esp32c6:FlashSize=8M,PartitionScheme=default_8MB,CDCOnBoot=default",
+  "core": "esp32:esp32@3.3.12",
+  "arduinoJson": "7.4.3",
+  "esptool": "5.3.1",
+  "benchWifiIncluded": true,
+  "sha256": {
+    "green2_testprosh.ino.bin": "76901e6c0aa6ed248037cf757bc4f694d235a9628aa85968e1f023c79a77dfa6",
+    "green2_testprosh.ino.bootloader.bin": "e0f22089b9ec19f1d1cc7418e4552f9613934f5540d75e84c4edea9746519917",
+    "green2_testprosh.ino.partitions.bin": "1d9cca96de0fe07ad7fc0648b9878ddecd9ce565e38b589ad20fea698ed4c80c"
+  },
+  "sourceSha256": {
+    "green2_testprosh.ino": "4db4f64fd1477c103212fed6f41a707c929a1a325d495c7c1cc7963360886e98",
+    "registration.h": "186c8bdbb8b7e0377500ad9a9d421bad5afe28056a7d9f9392a680203855d6ad",
+    "console.h": "af67b0210a30d15ec49fdc408fa6cbdaec65af1b079763d289fd49de52acfa9b"
+  }
+}

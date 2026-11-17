@@ -20,6 +20,20 @@ internal sealed class TestOutput(string profile)
     public bool Accept(string raw)
     {
         var line = raw.Trim();
+        if (profile == "testgreen2")
+        {
+            if (line.StartsWith("GREEN2_TEST REGISTERED id=GN_", StringComparison.Ordinal))
+                return Set(TestState.Passed, "Зарегистрировано · моторы не проверялись");
+            if (line.StartsWith("GREEN2_TEST ERROR ", StringComparison.Ordinal))
+                return Set(TestState.Failed, "Ошибка: " + line[18..]);
+            if (line.StartsWith("GREEN2_TEST READY ", StringComparison.Ordinal))
+                return Set(TestState.Waiting, "Готово к регистрации · удержите SYNC 2 с");
+            if (line.StartsWith("GREEN2_TEST WAIT ", StringComparison.Ordinal))
+                return Set(TestState.Waiting, "Ожидание: " + line[17..]);
+            if (line.StartsWith("GREEN2_TEST BOOT ", StringComparison.Ordinal))
+                return Set(TestState.Waiting, "Тест Green2 запущен · регистрация ещё не проверена");
+            return false;
+        }
         if (profile == "testirovanieFan")
         {
             if (line == "succes")

@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="10.0.12" />
-    <Content Include="../../projects/**/*.bin;../../projects/**/ino.json;../../projectsard/*/*.bin;../../projectsard/*/ino.json;../../img/*.jpg;../../partsheme/esptool.exe;../../partsheme/boot_app0.bin;../../partsheme 1.0.4.rc1/*.bin"
+    <Content Include="../../projects/**/*.bin;../../projects/**/ino.json;../../projects/**/build-info.json;../../projectsard/*/*.bin;../../projectsard/*/ino.json;../../img/*.jpg;../../partsheme/esptool*.exe;../../partsheme/esptool-c6-LICENSE;../../partsheme/boot_app0.bin;../../partsheme 1.0.4.rc1/*.bin"
              CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest">
       <Link>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)/../..', '%(FullPath)'))</Link>
     </Content>

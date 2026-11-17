@@ -10,25 +10,26 @@ namespace WpfApp1;
 
 internal sealed class FlashPackage : IDisposable
 {
-    private const int FlashSize = 4 * 1024 * 1024;
     // boot_app0.bin is shared by all Arduino kits in this distribution.
     private const string InitialOtaHash = "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0";
     private readonly List<FileStream> files = new();
     public ProcessStartInfo Command { get; }
 
-    public FlashPackage(ProcessStartInfo command, string loader, string table, string ota, string app)
+    public FlashPackage(ProcessStartInfo command, string loader, string table, string ota, string app, bool c6 = false)
     {
         Command = command;
         try
         {
-            ValidateFile(loader, 0x7000, ValidateImage);
+            int chipId = c6 ? 13 : 0;
+            int flashSize = (c6 ? 8 : 4) * 1024 * 1024;
+            ValidateFile(loader, c6 ? 0x8000 : 0x7000, data => ValidateImage(data, chipId));
             int appCapacity = 0;
-            ValidateFile(table, 0x1000, data => appCapacity = ReadPartitions(data));
+            ValidateFile(table, 0x1000, data => appCapacity = ReadPartitions(data, flashSize));
             ValidateFile(ota, 0x2000, data =>
                 Require(Convert.ToHexString(SHA256.HashData(data)) == InitialOtaHash, "повреждены начальные данные OTA"));
-            ValidateFile(app, appCapacity, ValidateImage);
+            ValidateFile(app, appCapacity, data => ValidateImage(data, chipId));
 
-            foreach (var value in new[] { "0x1000", loader, "0x8000", table, "0xe000", ota, "0x10000", app })
+            foreach (var value in new[] { c6 ? "0x0" : "0x1000", loader, "0x8000", table, "0xe000", ota, "0x10000", app })
                 command.ArgumentList.Add(value);
         }
         catch
@@ -55,10 +56,10 @@ internal sealed class FlashPackage : IDisposable
         }
     }
 
-    private static void ValidateImage(byte[] data)
+    private static void ValidateImage(byte[] data, int chipId)
     {
         Require(data.Length >= 32 && data[0] == 0xe9 && data[1] is >= 1 and <= 16 &&
-                U16(data, 12) == 0 && data[23] <= 1, "некорректный заголовок образа ESP32");
+                U16(data, 12) == chipId && data[23] <= 1, "некорректный заголовок или целевой чип образа ESP32");
         int pos = 24;
         byte checksum = 0xef;
         for (int i = 0; i < data[1]; i++)
@@ -79,7 +80,7 @@ internal sealed class FlashPackage : IDisposable
             Require(data.AsSpan(bodyLength).SequenceEqual(SHA256.HashData(data.AsSpan(0, bodyLength))), "не совпал SHA-256 образа");
     }
 
-    private static int ReadPartitions(byte[] data)
+    private static int ReadPartitions(byte[] data, int flashSize)
     {
         Require(data.Length % 32 == 0, "неполная запись таблицы разделов");
         var ranges = new List<(uint Start, uint End)>();
@@ -102,7 +103,7 @@ internal sealed class FlashPackage : IDisposable
             Require(magic == 0x50aa, "неверная сигнатура раздела");
             byte type = data[pos + 2], subtype = data[pos + 3];
             uint start = U32(data, pos + 4), size = U32(data, pos + 8);
-            Require(start >= 0x9000 && start < FlashSize && size > 0 && size <= FlashSize - start &&
+            Require(start >= 0x9000 && start < flashSize && size > 0 && size <= flashSize - start &&
                     start % (type == 0 ? 0x10000 : 0x1000) == 0, "некорректные границы раздела");
             Require(!ranges.Any(range => start < range.End && range.Start < start + size), "разделы пересекаются");
             ranges.Add((start, start + size));

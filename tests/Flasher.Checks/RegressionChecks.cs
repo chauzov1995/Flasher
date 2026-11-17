@@ -28,7 +28,13 @@ internal static class RegressionChecks
         if (args.FirstOrDefault() == "--chip")
         {
             string port = args[Array.IndexOf(args, "--port") + 1];
-            Console.WriteLine("MAC: AA:BB:CC:DD:EE:01");
+            if (args[1] == "esp32c6")
+            {
+                Console.WriteLine("MAC: AA:BB:CC:FF:FE:DD:EE:02");
+                Console.WriteLine("BASE MAC: AA:BB:CC:DD:EE:02");
+                Console.WriteLine("MAC_EXT: FF:FE");
+            }
+            else Console.WriteLine("MAC: AA:BB:CC:DD:EE:01");
             Console.Error.WriteLine($"write {port} {Path.GetFileName(args[^1])}");
             return port == Environment.GetEnvironmentVariable("FLASHER_CHECK_FAIL") ? 2 : 0;
         }
@@ -55,6 +61,7 @@ internal static class RegressionChecks
             foreach (var file in Directory.GetFiles(AppContext.BaseDirectory).Where(p => p.EndsWith(".dll") || p.EndsWith(".json")))
                 File.Copy(file, Path.Combine(toolDir, Path.GetFileName(file)));
             File.Copy(Path.Combine(AppContext.BaseDirectory, "Flasher.Checks.exe"), Path.Combine(toolDir, "esptool.exe"));
+            File.Copy(Path.Combine(AppContext.BaseDirectory, "Flasher.Checks.exe"), Path.Combine(toolDir, "esptool-c6.exe"));
 
             SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext());
             var app = new App();
@@ -115,14 +122,39 @@ internal static class RegressionChecks
         var first = rows[0];
         var second = rows[1];
         var profiles = first.DirectoryProject;
-        Check(rows.Length == 5 && profiles.Count == 10 && profiles.All(p => p.ValidationError == null), "all 10 shipped kits pass preflight");
+        Check(rows.Length == 5 && profiles.Count == 11 && profiles.All(p => p.ValidationError == null), "all 11 shipped kits pass preflight");
         foreach (var profile in profiles)
         {
             using var package = profile.Prepare(root, "COM91", false);
             var arguments = package.Command.ArgumentList;
-            Check(arguments.Contains("--erase-all") == (profile.NameDir is "testfenster" or "testteplica") &&
-                new[] { "0x1000", "0x8000", "0xe000", "0x10000" }.All(arguments.Contains), "addresses and erase policy for " + profile.NameDir);
+            Check(arguments.Contains("--erase-all") == (profile.NameDir is "testfenster" or "testteplica" or "testgreen2") &&
+                new[] { profile.Chip == "esp32c6" ? "0x0" : "0x1000", "0x8000", "0xe000", "0x10000" }.All(arguments.Contains), "addresses and erase policy for " + profile.NameDir);
         }
+
+        var c6 = profiles.Single(p => p.NameDir == "testgreen2");
+        using (var c6Kit = c6.Prepare(root, "COM91", false))
+        {
+            var a = c6Kit.Command.ArgumentList;
+            Check(a.Contains("esp32c6") && a.Contains("8MB") && a.Contains("write-flash") &&
+                !a.Contains("4MB") && Path.GetFileName(c6Kit.Command.FileName) == "esptool-c6.exe",
+                "C6 selects its own esptool, chip and 8MB geometry");
+        }
+        void RejectC6(string label)
+        {
+            try { using var kit = c6.Prepare(root, "COM91", false); throw new Exception("accepted: " + label); }
+            catch (InvalidDataException) { Check(true, label); }
+        }
+        c6.FlashSize = "4MB"; RejectC6("C6 with 4MB manifest rejected"); c6.FlashSize = "8MB";
+        c6.Layout = "1.0.4.rc1"; RejectC6("C6 cannot borrow classic ESP32 layout"); c6.Layout = null;
+        c6.Chip = "esp32s3"; RejectC6("unsupported chip rejected"); c6.Chip = "esp32c6";
+        var c6Path = Path.Combine(root, "projects", "testgreen2", c6.BinName);
+        var c6Original = File.ReadAllBytes(c6Path);
+        try
+        {
+            File.Copy(Path.Combine(root, "projects", "testteplica", profiles.Single(p => p.NameDir == "testteplica").BinName), c6Path, true);
+            RejectC6("valid ESP32 application rejected in C6 kit");
+        }
+        finally { File.WriteAllBytes(c6Path, c6Original); }
 
         first.Path = "testfenster"; first.Port = "COM91";
         second.Path = "testteplica"; second.Port = "COM91";
@@ -247,6 +279,22 @@ internal static class RegressionChecks
         Write(w, single);
         Check(third.Stage == FlashStage.Success && !SerialPort.Active.ContainsKey("COM91") && w.txt_log.Text.Contains("Порт занят"), "busy monitor does not turn a completed write into a failure");
         SerialPort.BusyPort = null;
+        third.Path = "testgreen2";
+        Write(w, single);
+        Check(third.Stage == FlashStage.Success && third.flMAC == "AABBCCDDEE02", "C6 flash captures six-byte BASE MAC, not EUI-64");
+        Feed("COM91", "GREEN2_TEST READY send @g register\n");
+        Check(w.txt_err.Text.Contains("Готово к регистрации") && !w.txt_err.Text.Contains("Зарегистрировано"), "C6 readiness does not claim registration");
+        Feed("COM91", "OK\nGREEN2_TEST STATUS sht31=ok\n");
+        Check(!w.txt_err.Text.Contains("Зарегистрировано"), "bare OK and sensor status cannot pass C6 registration");
+        Feed("COM91", "GREEN2_TEST REGIST");
+        Feed("COM91", "ERED id=GN_aabbccddee02 child=GN_aabbccddee02_1\n");
+        Check(w.txt_err.Text.Contains("Зарегистрировано · моторы не проверялись"), "C6 split registration result carries limited test scope");
+        Feed("COM91", "GREEN2_TEST WAIT overwriting_registration\n");
+        Check(w.txt_err.Text.Contains("overwriting_registration") && !w.txt_err.Text.Contains("Зарегистрировано"), "C6 repeated registration clears previous success while replacing configuration");
+        Feed("COM91", "GREEN2_TEST ERROR registration_readback_failed\n");
+        Check(w.txt_err.Text.Contains("registration_readback_failed") && !w.txt_err.Text.Contains("Зарегистрировано"), "C6 failed write verification cannot report success");
+        Feed("COM91", "GREEN2_TEST BOOT registration-only\n");
+        Check(w.txt_err.Text.Contains("регистрация ещё не проверена"), "C6 reboot clears stale result");
         w.chk_erase.IsChecked = true; w.Close();
         var restored = new MainWindow(root, home);
         Open(restored);
